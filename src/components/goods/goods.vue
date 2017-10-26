@@ -34,11 +34,13 @@
         </li>
       </ul>
     </div>
+    <shopcart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import BScroll from 'better-scroll'
+  import shopcart from '../shopcart/shopcart'
   export default {
     props: {
       seller: {
@@ -51,6 +53,9 @@
         listHeight: [],
         scrollY: 0
       }
+    },
+    components: {
+      shopcart
     },
     computed: {
       currentIndex () {
@@ -96,7 +101,6 @@
         }
       },
       selectMenu (index, event) {
-        alert(index)
         // if (event._constructed) {
         //   return
         // }
