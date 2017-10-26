@@ -75,6 +75,9 @@
       })
     },
     methods: {
+      test (index) {
+        alert(index)
+      },
       initScroll () {
         this.foodsScroll = new BScroll(this.$refs.foods, {})
         this.menuScroll = new BScroll(this.$refs.menu, { probeType: 3 })       
@@ -93,13 +96,13 @@
         }
       },
       selectMenu (index, event) {
-        if (!event._constructed) {
-          return
-        }
-        console.log(index)
+        alert(index)
+        // if (event._constructed) {
+        //   return
+        // }
         let foodList = this.$refs.foods.getElementsByClassName('food-list-hook')
         let el = foodList[index]
-        this.foodsScroll.scrollToElement(el, 300)
+        this.foodsScroll.scrollToElement(el, 300) // scrollToElement(el, time, offsetX, offsetY, easing)  作用：滚动到指定的目标元素
       }
     }
   }

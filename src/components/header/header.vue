@@ -30,7 +30,8 @@
     <div class="background">
       <img :src="seller.avatar" width="100%" height="100%">
     </div>
-    <div class="detail" v-show="detailShow">
+    <transition name="fade">
+      <div class="detail" v-show="detailShow">
       <div class="detail-wrapper clearfix">
         <div class="detail-main">
           <h1 class="name">{{seller.name}}</h1>
@@ -60,6 +61,7 @@
         <i class="fa fa-times" aria-hidden="true"></i>
       </div>
     </div>
+    </transition>
   </div>
 </template>
 
@@ -228,16 +230,9 @@
     width: 100%;
     height: 100%;
     overflow: auto;
+    z-index: 1049;
     transition: all 0.5s;
     background-color: rgba(7,17,27,.8);
-    &.fade-transition{
-      background-color: rgba(7,17,27,.8);
-      opacity: 1;
-    } 
-    &.fade-enter, &.fade-leave{
-       background-color: rgba(7,17,27,0.8);
-       opacity: 0;
-    }
     background-drop: blur(10px);
     .detail-wrapper{
       min-height: 100%;
@@ -332,5 +327,13 @@
       }
     }
   }
+}
+.fade-enter-active, .fade-leave-active{
+  background-color: rgba(7,17,27,.8);
+  opacity: 1;
+}
+.fade-enter, .fade-leave-to{
+  background-color: rgba(7,17,27,.8);
+  opacity: 0;
 }
 </style>
