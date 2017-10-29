@@ -28,19 +28,23 @@
                   <span>￥{{food.price}}</span>
                   <span v-show="food.oldPrice">￥{{food.oldPrice}}</span>
                 </div>
+                <div class="cartcount-wrapper">
+                  <cartcount :food="food"></cartcount>
+                </div>
               </div>
             </li>
           </ul>
         </li>
       </ul>
     </div>
-    <shopcart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
+    <shopcart v-ref="shopcart" :delivery-price="seller.deliveryPrice" :select-foods="selectFoods" :min-price="seller.minPrice"></shopcart>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import BScroll from 'better-scroll'
   import shopcart from '../shopcart/shopcart'
+  import cartcount from '../cartcount/cartcount'
   export default {
     props: {
       seller: {
@@ -55,7 +59,7 @@
       }
     },
     components: {
-      shopcart
+      shopcart, cartcount
     },
     computed: {
       currentIndex () {
@@ -67,6 +71,17 @@
           }
           return 0
         }
+      },
+      selectFoods () {
+        let foods = []
+        this.goods.forEach((good) => {
+          good.foods.forEach((food) => {
+            if (food.count) {
+              foods.push(food)
+            }
+          })
+        })
+        return foods
       }
     },
     created () {
@@ -80,12 +95,14 @@
       })
     },
     methods: {
-      test (index) {
-        alert(index)
-      },
       initScroll () {
-        this.foodsScroll = new BScroll(this.$refs.foods, {})
-        this.menuScroll = new BScroll(this.$refs.menu, { probeType: 3 })       
+        this.foodsScroll = new BScroll(this.$refs.foods, {
+          click: true
+        })
+        this.menuScroll = new BScroll(this.$refs.menu, { 
+          click: true,
+          probeType: 3
+        })       
         this.foodsScroll.on('scroll', (pos) => {
           this.scrollY = Math.abs(Math.round(pos.y))
         }) 
@@ -101,12 +118,20 @@
         }
       },
       selectMenu (index, event) {
-        // if (event._constructed) {
-        //   return
-        // }
+        if (!event._constructed) {
+          return
+        }
         let foodList = this.$refs.foods.getElementsByClassName('food-list-hook')
         let el = foodList[index]
         this.foodsScroll.scrollToElement(el, 300) // scrollToElement(el, time, offsetX, offsetY, easing)  作用：滚动到指定的目标元素
+      },
+      drop (target) {
+        this.$refs.shopcart.drop(target)
+      }
+    },
+    events: {
+      'cart.add' (target) {
+        this.drop(target)
       }
     }
   }
@@ -198,6 +223,7 @@
           flex: 0 0 57px;
         }
         .contents{
+          flex: 1;
           padding-left: 10px;
           padding-top: 2px;
           .name{
@@ -231,6 +257,11 @@
               color: rgb(147,153,159);
               text-decoration: line-through;
             }
+          }
+          .cartcount-wrapper{
+            position: absolute;
+            bottom: 12px;
+            right: 0;
           }
         }
       }

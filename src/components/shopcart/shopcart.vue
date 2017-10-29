@@ -3,14 +3,22 @@
     <div class="content">
         <div class="content-left">
             <div class="logo-wrapper">
-                <div class="logo">
+                <div class="logo" :class="{'highlight': totalCount >0}">
                     <i class="fa fa-shopping-cart" aria-hidden="true"></i>                    
                 </div>
+                <div class="num" v-show="totalCount >0">{{totalCount}}</div>
             </div>
-            <div class="price">0yuan</div>
+            <div class="price" :class="{'highlight': totalPrice > 0}">￥{{totalPrice}}元</div>
             <div class="desc">另需配送费￥{{deliveryPrice}}</div>
         </div>
-        <div class="content-right">￥{{minPrice}}起送</div>
+        <div class="content-right" :class="[this.totalPrice < this.minPrice ? 'not-enough' : 'enough']">{{payDes}}</div>
+    </div>
+    <div class="ball-container">
+        <transition name="drop">
+            <div v-for="ball in balls" v-show="ball.show" class="ball">
+                <div class="inner"></div>
+            </div>
+        </transition>
     </div>
   </div>
 </template>
@@ -18,6 +26,12 @@
 <script type="text/ecmascript-6">
   export default {
       props: {
+          selectFoods: {
+              type: Array,
+              default () {
+                  return []
+              }
+          },
           deliveryPrice: {
               type: Number,
               default: 0
@@ -25,6 +39,52 @@
           minPrice: {
               type: Number,
               default: 0
+          }
+      },
+      computed: {
+          totalPrice () {
+              let total = 0
+              this.selectFoods.forEach((food, index) => {
+                  total += Number(food.price) * Number(food.count)
+              })
+              return total
+          },
+          totalCount () {
+              let count = 0
+              this.selectFoods.forEach((food, index) => {
+                  count += food.count
+              })
+              return count
+          },
+          payDes () {
+              if (this.totalPrice === 0) {
+                  return `￥${this.minPrice}元起送`
+              } else if (this.totalPrice < this.minPrice) {
+                  let diff = this.minPrice - this.totalPrice
+                  return `还差￥${diff}元起送`
+              } else {
+                  return '去结算'
+              }
+          }
+      },
+      data () {
+          return {
+              balls: [{show: false}, {show: false}, {show: false}, {show: false}, {show: false}],
+              dropballs: []
+          }
+      },
+      methods: {
+          drop (el) {
+            //   console.log(el)
+            for (let i = 0; i < this.balls.lengths; i++) {
+                let ball = this.balls[i]
+                if (!ball.show) {
+                    ball.show = true
+                    ball.el = el
+                    this.dropballs.push(ball)
+                    return
+                }
+            }
           }
       }
   }
@@ -69,6 +129,27 @@
                           font-size: 24px;
                           color: #80858a;
                       }
+                    &.highlight{
+                        background-color: rgb(0, 160, 220);
+                        .fa{
+                            color: #fff;
+                        }
+                    }
+                  }
+                  .num{
+                      position: absolute;
+                      top: 0;
+                      right: 0;
+                      width: 24px;
+                      height: 16px;
+                      line-height: 16px;
+                      border-radius: 16px;
+                      background-color: rgb(240, 20, 20);
+                      box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.4);
+                      text-align: center;
+                      font-size: 9px;
+                      font-weight: 700;
+                      color: #fff;
                   }
               }
               .price{
@@ -82,6 +163,9 @@
                   font-size: 16px;
                   font-weight: 700;
                   color: rgba(255,255,255,0.4);
+                  &.highlight{
+                      color: #fff;
+                  }
               }
               .desc{
                   display: inline-block;   
@@ -101,8 +185,29 @@
               font-size: 12px;
               font-weight: 700;
               color: rgba(255,255,255,0.4);
-              background-color: #2B333B;
               text-align: center;
+              &.not-enough{
+                background-color: #2B333B;
+              }
+              &.enough{
+                background-color: green;
+                color: #fff;
+              }
+          }
+      }
+      .ball-container{
+          .ball{
+              position: fixed;
+              left: 32px;
+              bottom: 22px;
+              z-index: 2000;
+              .inner{
+                  width: 16px;
+                  height: 16px;
+                  border-radius: 50%;
+                  background-color: rgb(0, 160, 220);
+                  transition: all 0.6s;
+              }
           }
       }
   }
