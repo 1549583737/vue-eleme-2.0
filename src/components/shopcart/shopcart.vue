@@ -24,7 +24,6 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import {eventBus} from '../../../static/js/event-bus'
   export default {
       props: {
           selectFoods: {
@@ -73,11 +72,6 @@
               balls: [{show: false}, {show: false}, {show: false}, {show: false}, {show: false}],
               dropballs: []
           }
-      },
-      created () {
-          eventBus.$on('addcart', (ele) => {
-              console.log('ele' + ele)
-          })
       },
       methods: {
           drop (el) {

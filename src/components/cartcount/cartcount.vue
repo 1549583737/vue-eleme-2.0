@@ -2,9 +2,7 @@
     <div class="cartcount">
         <transition name="move">
             <div class="cart-decrease" v-show="food.count>0" @click="decreaseCount($event)">
-                <span class="inner">
-                    <i class="fa fa-minus-circle" aria-hidden="true"></i>                  
-                </span>
+                <i class="inner fa fa-minus-circle" aria-hidden="true"></i>                  
             </div>
         </transition>
         <div class="cart-count" v-show="food.count>0">{{food.count}}</div>
@@ -13,7 +11,6 @@
 </template>
 
 <script>
-import {eventBus} from '../../../static/js/event-bus'
 export default {
   props: {
       food: {
@@ -30,7 +27,7 @@ export default {
           } else {
               this.food.count++
           }
-          eventBus.$emit('addcart', event.target)
+          this.$emit('add', event.target)
       },
       decreaseCount (event) {
           if (!event._constructed) {
@@ -47,7 +44,7 @@ export default {
 <style lang="scss" rel="stylesheet/scss" scoped>
 .cartcount{
     font-size: 0;
-    .cart-decrease, .cart-add{
+    .cart-add{
         display: inline-block;
         padding: 6px;
         font-size: 24px;
@@ -55,25 +52,19 @@ export default {
         color: #00A0DC;
     }
     .cart-decrease{
-        transition: all 0.4s linear;
+        display: inline-block;
+        padding: 6px;
+        opacity: 1;
+        transform: translate3d(0,0,0);
         .inner{
             display: inline-block;
+            line-height: 24px;
+            font-size: 24px;
+            color: rgb(0, 160, 220);
             transition: all 0.4s linear;
             transform: rotate(0);
         }
-        // &.move-transition{
-        //     opacity: 1;
-        //     transform: translate3d(0,0,0);
-        // }
-        // &.move-enter, &.move-leave{
-        //     opacity: 0;
-        //     transform: translate3d(24px, 0, 0);
-        //     .inner{
-        //         opacity: 0;
-        //         transform: rotate(180deg);
-        //     }
-        // }
-        &.move-enter-active{
+        &.move-enter-active, &.move-leave-active{
             opacity: 1;
             transform: translate3d(0,0,0);
         }
@@ -81,7 +72,6 @@ export default {
             opacity: 0;
             transform: translate3d(24px, 0, 0);
             .inner{
-                opacity: 0;
                 transform: rotate(180deg);
             }
         }

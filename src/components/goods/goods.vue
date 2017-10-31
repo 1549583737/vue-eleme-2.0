@@ -29,7 +29,7 @@
                   <span v-show="food.oldPrice">￥{{food.oldPrice}}</span>
                 </div>
                 <div class="cartcount-wrapper">
-                  <cartcount :food="food"></cartcount>
+                  <cartcount @add="addFood" :food="food"></cartcount>
                 </div>
               </div>
             </li>
@@ -125,13 +125,14 @@
         let el = foodList[index]
         this.foodsScroll.scrollToElement(el, 300) // scrollToElement(el, time, offsetX, offsetY, easing)  作用：滚动到指定的目标元素
       },
-      drop (target) {
-        this.$refs.shopcart.drop(target)
-      }
-    },
-    events: {
-      'cart.add' (target) {
+      addFood (target) {
         this.drop(target)
+      },
+      drop (target) {
+        // 体验优化,异步执行下落动画
+        this.$nextTick(() => {
+          this.$refs.shopcart.drop(target)
+        })
       }
     }
   }
