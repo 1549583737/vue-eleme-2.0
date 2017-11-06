@@ -18,6 +18,8 @@
     </div>
     <!-- 1px 边框 -->
     <div class="container border-1px"></div>
+    <!-- Range.getBoundingClientRect() https://developer.mozilla.org/zh-CN/docs/Web/API/Element/getBoundingClientRect -->
+    <div class="bounding bounding-hook" style="width: 100px; height: 100px; margin-left: 15px; background-color: rgb(0,160,220)"></div>
   </div>
 </template>
 
@@ -31,6 +33,12 @@
         single: false,
         rotateBall: true
       }
+    },
+    created () {
+      this.$nextTick(() => {
+        let rect = document.getElementsByClassName('bounding-hook')[0].getBoundingClientRect()
+        console.log(rect)
+      })
     }
   }
 

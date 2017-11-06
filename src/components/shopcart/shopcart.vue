@@ -129,7 +129,7 @@ import BScroll from 'better-scroll'
       },
       methods: {
         drop (el) {
-            for (let i = 0; i < this.balls.lengths; i++) {
+            for (let i = 0; i < this.balls.length; i++) {
                 let ball = this.balls[i]
                 if (!ball.show) {
                     ball.show = true
@@ -168,7 +168,7 @@ import BScroll from 'better-scroll'
             })
         },
         afterDrop (el) {
-            let ball = this.dropBalls.shift()
+            let ball = this.dropballs.shift()
             if (ball) {
                 ball.show = false
                 el.style.display = 'none'
