@@ -18,14 +18,24 @@
                         <span class="new">￥{{foodList.price}}</span>
                         <span class="old" v-show="foodList.oldPrice">￥{{foodList.oldPrice}}</span>
                     </div>
+                     <div class="cartcount-wrapper">
+                        <cartcount :food="foodList"></cartcount>
+                    </div>
+                    <transition name="fade">
+                        <div class="buy" @click.stop.prevent="addFirst($event)" 
+                        v-show="!foodList.count || foodList.count === 0">加入购物车</div>
+                    </transition>
                 </div>
-                <div class="cartcount-wrapper">
-                    <cartcount :food="foodList"></cartcount>
+                <split v-show="foodList.info"></split>
+                <div class="info" v-show="foodList.info">
+                    <h1 class="title">商品信息</h1>
+                    <p class="text">{{foodList.info}}</p>
                 </div>
-                <transition name="fade">
-                    <div class="buy" @click.stop.prevent="addFirst($event)" 
-                    v-show="!foodList.count || foodList.count === 0">加入购物车</div>
-                </transition>
+                <split></split>
+                <div class="rating">
+                    <h1 class="title">商品评价</h1>
+                    <ratingSelect :select-type="selectType" :only-type="onlyType" :desc="desc" :ratings="foodList.ratings"></ratingSelect>
+                </div>
             </div>
         </div>
     </transition>
@@ -34,6 +44,13 @@
 <script>
 import BScroll from 'better-scroll'
 import cartcount from '../cartcount/cartcount'
+import split from '../split/split'
+import ratingSelect from '../ratingSelect/ratingSelect'
+
+const POSITIVE = 0
+const NEGATIVE = 1
+const ALL = 2
+
 export default {
     props: {
         foodList: {
@@ -42,14 +59,23 @@ export default {
     },
     data () {
         return {
-            showFlag: false
+            showFlag: false,
+            selectType: ALL,
+            onlyType: true,
+            desc: {
+                all: '满意',
+                positive: '推荐',
+                negative: '吐槽'
+            }
         }   
     },
     components: {
-        cartcount
+        cartcount, split, ratingSelect
     },
     methods: {
         show () {
+            this.selectType = ALL
+            this.onlyType = true
             this.showFlag = true
             this.$nextTick(() => {
                 if (!this.scroll) {
@@ -113,6 +139,7 @@ export default {
         }
     }
     .content{
+        position: relative;
         padding: 18px;
         .title{
             line-height: 14px;
@@ -153,31 +180,58 @@ export default {
                 color: rgb(147,153,159);
             }
         }
-    }
-    .cartcount-wrapper{
-        position: absolute;
-        right: 12px;
-        bottom: 12px;
-    }
-    .buy{
-        position: absolute;
-        right: 18px;
-        bottom: 18px;
-        z-index: 10;
-        height: 24px;
-        line-height: 24px;
-        padding: 0 12px;
-        box-sizing: border-box;
-        border-radius: 12px;
-        background-color: rgb(0,160,220);
-        color: #fff;
-        font-size: 10px;
-        &.fade-enter-active, &.fade-leave-active{
-            transition: all 0.2s linear;
-            opacity: 1;
+        .cartcount-wrapper{
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
         }
-        &.fade-enter, &.fade-leave-to{
-            opacity:0;
+        .buy{
+            position: absolute;
+            right: 18px;
+            bottom: 18px;
+            z-index: 10;
+            height: 24px;
+            line-height: 24px;
+            padding: 0 12px;
+            box-sizing: border-box;
+            border-radius: 12px;
+            background-color: rgb(0,160,220);
+            color: #fff;
+            font-size: 10px;
+            &.fade-enter-active, &.fade-leave-active{
+                transition: all 0.2s linear;
+                opacity: 1;
+            }
+            &.fade-enter, &.fade-leave-to{
+                opacity:0;
+            }
+        }
+    }
+    .info{
+        padding: 18px;
+        .title{
+            margin-bottom: 6px;
+            line-height: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            color: rgb(7,17,27);
+        }
+        .text{
+            padding: 0 8px;
+            line-height: 24px;
+            font-size: 12px;
+            font-weight: 200;
+            color: rgb(77,85,93);
+        }
+    }
+    .rating{
+        padding-top: 18px;
+        .title{
+            margin: 0 18px;
+            line-height: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            color: rgb(7,17,27);
         }
     }
 }

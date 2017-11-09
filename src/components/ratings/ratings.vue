@@ -11,8 +11,8 @@
     <div class="rotate-content">
       <button @click="rotateBall = !rotateBall">button</button>
       <transition name="rotate">
-        <div class="ball" v-show="rotateBall">
-          <div class="inner"></div>
+        <div class="ball" v-show="rotateBall"> <!-- 外层控制位移 -->
+          <div class="inner"></div> <!-- 内层控制旋转 -->
         </div>
       </transition>
     </div>
