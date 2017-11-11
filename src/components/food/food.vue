@@ -34,7 +34,31 @@
                 <split></split>
                 <div class="rating">
                     <h1 class="title">商品评价</h1>
-                    <ratingSelect :select-type="selectType" :only-type="onlyType" :desc="desc" :ratings="foodList.ratings"></ratingSelect>
+                    <ratingSelect @select="select" @toggle="toggle"
+                                  :select-type="selectType" 
+                                  :only-content="onlyContent" 
+                                  :desc="desc" 
+                                  :ratings="foodList.ratings">
+                    </ratingSelect>
+                    <div class="rating-wrapper">
+                        <ul v-show="foodList.ratings.length && foodList.ratings">
+                            <li v-show="needShow(rating.rateType, rating.text)"
+                                v-for="rating in foodList.ratings" class="rating-item border-1px">
+                                <div class="user">
+                                    <span class="name">{{rating.username}}</span>
+                                    <img class="avatar" :src="rating.avatar" width="12" height="12">
+                                </div>
+                                <div class="time">{{rating.rateTime |formatTime}}</div>
+                                <p class="text">
+                                    <i class="fa" :class="{'fa-thumbs-down': rating.rateType === 1, 'fa-thumbs-up': rating.rateType === 0}" aria-hidden="true"></i>
+                                    {{rating.text}}
+                                </p>
+                            </li>
+                        </ul>
+                        <div class="no-ratings" v-show="!foodList.ratings.length || !foodList.ratings">
+                            暂无评价
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -46,6 +70,7 @@ import BScroll from 'better-scroll'
 import cartcount from '../cartcount/cartcount'
 import split from '../split/split'
 import ratingSelect from '../ratingSelect/ratingSelect'
+import {formatDate} from '../../common/js/date.js' 
 
 const POSITIVE = 0
 const NEGATIVE = 1
@@ -61,9 +86,9 @@ export default {
         return {
             showFlag: false,
             selectType: ALL,
-            onlyType: true,
+            onlyContent: true,
             desc: {
-                all: '满意',
+                all: '全部',
                 positive: '推荐',
                 negative: '吐槽'
             }
@@ -72,10 +97,16 @@ export default {
     components: {
         cartcount, split, ratingSelect
     },
+    filters: {
+        formatTime (datetime) {
+            let date = new Date(datetime)
+            return formatDate(date, 'yyyy-MM-dd hh:mm')
+        }
+    },
     methods: {
         show () {
             this.selectType = ALL
-            this.onlyType = true
+            this.onlyContent = true
             this.showFlag = true
             this.$nextTick(() => {
                 if (!this.scroll) {
@@ -93,12 +124,35 @@ export default {
             }
             this.$emit('add', event.target)
             this.$set(this.foodList, 'count', 1)
+        },
+        needShow (type, text) {
+            if (this.onlyContent && !text) {
+                return false
+            }
+            if (this.selectType === ALL) {
+                return true
+            } else {
+                return type === this.selectType
+            }
+        },
+        select (type) {
+            this.selectType = type
+            this.$nextTick(() => {
+                this.scroll.refresh()
+            })
+        },
+        toggle (msg) {
+            this.onlyContent = msg
+            this.$nextTick(() => {
+                this.scroll.refresh()
+            })
         }
     }
 }
 </script>
 
 <style lang="scss" scoped>
+@import "../../common/scss/mixin";
 .slide-enter-active, .slide-leave-active{
     transition: all 0.2s linear;
     transform: translate3d(0,0,0);
@@ -232,6 +286,56 @@ export default {
             font-size: 14px;
             font-weight: 700;
             color: rgb(7,17,27);
+        }
+        .rating-wrapper{
+            .rating-item{
+                position: relative;
+                padding: 16px 18px;
+                @include border-1px(rgba(7,17,27,0.1));
+                .user{
+                    position: absolute;
+                    top: 18px;
+                    right: 18px;
+                    font-size: 0;
+                    .name{
+                        display: inline-block;
+                        margin-right: 6px;
+                        line-height: 12px;
+                        font-size: 10px;
+                        color: rgb(147,153,159);
+                        vertical-align: top;
+                    }
+                    .avatar{
+                        border-radius: 50%;
+                        vertical-align: top;
+                    }
+                }
+                .time{
+                    line-height: 12px;
+                    font-size: 10px;
+                    color: rgb(147,153,159);
+                }
+                .text{
+                    line-height: 16px;
+                    font-size: 12px;
+                    color: rgb(7,17,27);
+                    .fa{
+                        margin-right: 4px;
+                        line-height: 24px;
+                        font-size: 12px;
+                        &.fa-thumbs-down{
+                            color: rgb(147,153,159);                           
+                        }
+                        &.fa-thumbs-up{
+                            color: rgb(0,160,220);
+                        }
+                    }
+                }
+            }
+            .no-ratings{
+                font-size: 12px;
+                color: rgb(147,153,159);
+            }
         }
     }
 }
