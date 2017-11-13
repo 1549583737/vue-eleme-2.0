@@ -24,12 +24,41 @@
           </div>
         </div>
       </div>
+      <split></split>
+      <rating-select :select-type="selectType"
+                     :only-content="onlyContent"
+                     :desc="desc"
+                     :ratings="ratings">
+      </rating-select>
+      <div class="ratings-wrapper">
+        <ul>
+          <li class="rating-list" v-for="rating in ratings">
+            <div class="avatar">
+              <img :src="rating.avatar" width="28" height="28">
+            </div>
+            <div class="content">
+              <h2 class="name">{{rating.username}}</h2>
+              <div class="star-wrapper">
+                <star :size="24" :score="rating.score"></star>
+                <span class="time" v-show="rating.deliveryTime">{{rating.deliveryTime}}</span>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import star from '../star/star'
+  import split from '../split/split'
+  import ratingSelect from '../ratingSelect/ratingSelect'
+
+  const POSITIVE = 0
+  const NEGATIVE = 1
+  const ALL = 2
+
   export default {
     props: {
       seller: {
@@ -37,11 +66,27 @@
       }
     },
     components: {
-      star
+      star, split, ratingSelect
     },
     data () {
       return {
-      }
+        ratings: [],
+        showFlag: false,
+        selectType: ALL,
+        onlyContent: true,
+        desc: {
+          all: '全部',
+          positive: '满意',
+          negative: '不满意'
+        }
+      }   
+    },
+    created () {
+      this.$nextTick(() => {
+        this.$http.get('../../../static/data/data.json').then((response) => {
+          this.ratings = response.body.ratings
+        })
+      })
     }
   }
 
@@ -64,6 +109,10 @@
       padding: 6px 0;
       text-align: center;
       border-right: 1px solid rgba(7,17,27,0.1);
+      @media only screen and (max-width: 320px) {
+        flex: 0 0 120px;
+        width: 120px;
+      }
       .score{
         line-height: 28px;
         font-size: 24px;
@@ -83,7 +132,10 @@
     }
     .overview-right{
       flex: 1;
-      padding: 0 24px;
+      padding: 6px 0 6px 24px;
+      @media only screen and (max-width: 320px) {
+        padding-left: 6px;
+      }
       .score-wrapper{
         margin-bottom: 8px;
         font-size: 0;
