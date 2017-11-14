@@ -1,5 +1,5 @@
 <template>
-  <div class="ratings">
+  <div class="ratings" ref="ratings">
     <div class="ratings-content">
       <div class="overview">
         <div class="overview-left">
@@ -28,11 +28,13 @@
       <rating-select :select-type="selectType"
                      :only-content="onlyContent"
                      :desc="desc"
-                     :ratings="ratings">
+                     :ratings="ratings"
+                     @select="select"
+                     @toggle="toggle">
       </rating-select>
       <div class="ratings-wrapper">
         <ul>
-          <li class="rating-list" v-for="rating in ratings">
+          <li class="rating-list" v-for="rating in ratings" v-show="needShow(rating.rateType, rating.text)">
             <div class="avatar">
               <img :src="rating.avatar" width="28" height="28">
             </div>
@@ -40,9 +42,15 @@
               <h2 class="name">{{rating.username}}</h2>
               <div class="star-wrapper">
                 <star :size="24" :score="rating.score"></star>
-                <span class="time" v-show="rating.deliveryTime">{{rating.deliveryTime}}</span>
+                <span class="time" v-show="rating.deliveryTime">{{rating.deliveryTime}}分钟送达</span>
+              </div>
+              <h1 class="text">{{rating.text}}</h1>
+              <div class="recommend" v-show="rating.recommend && rating.recommend.length > 0">
+                <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                <span class="item" v-for="item in rating.recommend">{{item}}</span>
               </div>
             </div>
+            <div class="rate-time">{{rating.rateTime  |formatTime}}</div>
           </li>
         </ul>
       </div>
@@ -51,9 +59,11 @@
 </template>
 
 <script type="text/ecmascript-6">
+  import BScroll from 'better-scroll'
   import star from '../star/star'
   import split from '../split/split'
   import ratingSelect from '../ratingSelect/ratingSelect'
+  import {formatDate} from '../../common/js/date.js' 
 
   const POSITIVE = 0
   const NEGATIVE = 1
@@ -81,12 +91,45 @@
         }
       }   
     },
+    filters: {
+        formatTime (datetime) {
+            let date = new Date(datetime)
+            return formatDate(date, 'yyyy-MM-dd hh:mm')
+        }
+    },
     created () {
-      this.$nextTick(() => {
-        this.$http.get('../../../static/data/data.json').then((response) => {
-          this.ratings = response.body.ratings
+      this.$http.get('../../../static/data/data.json').then((response) => {
+        this.ratings = response.body.ratings
+        this.$nextTick(() => {
+          this.scroll = new BScroll(this.$refs.ratings, {
+            click: true 
+          })
         })
       })
+    },
+    methods: {
+      select (type) {
+        this.selectType = type
+        this.$nextTick(() => {
+            this.scroll.refresh()
+        })
+      },
+      toggle (msg) {
+        this.onlyContent = msg
+        this.$nextTick(() => {
+            this.scroll.refresh()
+        })
+      },
+      needShow (type, text) {
+        if (this.onlyContent && !text) {
+          return false
+        }
+        if (this.selectType === ALL) {
+          return true
+        } else {
+          return type === this.selectType
+        }
+      }
     }
   }
 
@@ -176,6 +219,85 @@
           line-height: 18px;
           color: rgb(147,153,159);
         }
+      }
+    }
+  }
+  .ratings-wrapper{
+    padding: 0 18px;
+    .rating-list{ 
+      position: relative;
+      display: flex;
+      padding: 18px 0;
+      .avatar{
+        flex: 0 0 28px;
+        img{
+          border-radius: 50%;
+        }
+      }
+      .content{
+        flex: 1;
+        margin-left: 12px;
+        .name{
+          line-height: 12px;
+          font-size: 10px;
+          color: rgb(7,17,27);
+        }
+        .star-wrapper{
+          margin: 4px 0 6px 0;
+          font-size: 0;
+          .star{
+            display: inline-block;
+            
+          }
+          .time{
+            display: inline-block;
+            margin-left: 6px;
+            line-height: 12px;
+            font-size: 10px;
+            color: rgb(147,153,159);
+          }
+        }
+        .text{
+          line-height: 18px;
+          font-size: 12px;
+          color: rgb(7,17,27);
+        }
+        .recommend{
+          margin-top: 8px;
+          font-size: 0;
+          .fa{
+            margin-right: 8px;
+            margin-bottom: 8px;
+            line-height: 16px;
+            font-size: 12px;
+            &.fa-thumbs-up{
+              color: rgb(0,160,220);
+            }
+          }
+          .item{
+            display: inline-block;
+            margin-bottom: 8px;
+            padding: 6px;
+            &:not(::last-of-type){
+              margin-right: 8px;
+            }
+            line-height: 16px;
+            border-width: 1px;
+            border-color: rgba(7,17,27,0.1);
+            border-radius: 2px;
+            background-color: rgb(255,255,255);
+            font-size: 9px;
+            color: rgb(147,153,159);
+          }
+        }
+      }
+      .rate-time{
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        line-height: 12px;
+        font-size: 10px;
+        color: rgb(147,153,159);
       }
     }
   }
