@@ -41,7 +41,7 @@
                                   :ratings="foodList.ratings">
                     </ratingSelect>
                     <div class="rating-wrapper">
-                        <ul v-show="foodList.ratings.length && foodList.ratings">
+                        <ul v-show="foodList.ratings && foodList.ratings.length">
                             <li v-show="needShow(rating.rateType, rating.text)"
                                 v-for="rating in foodList.ratings" class="rating-item border-1px">
                                 <div class="user">
@@ -55,7 +55,7 @@
                                 </p>
                             </li>
                         </ul>
-                        <div class="no-ratings" v-show="!foodList.ratings.length || !foodList.ratings">
+                        <div class="no-ratings" v-show="!foodList.ratings || !foodList.ratings.length">
                             暂无评价
                         </div>
                     </div>
