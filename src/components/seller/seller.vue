@@ -34,6 +34,19 @@
         </div>
       </div>
       <split></split>
+      <div class="bulletin">
+        <h1 class="title">公告与活动</h1>
+        <div class="content-wrapper border-1px">
+          <p class="content">{{seller.bulletin}}</p>
+        </div>
+        <ul class="supports" v-if="seller.supports">
+          <li class="support-item border-1px" v-for="support in seller.supports">
+            <span class="icon" :class="classMap[support.type]"></span>
+            <span class="text">{{support.description}}</span>
+          </li>
+        </ul>
+      </div>
+      <split></split>
     </div>
   </div>
 </template>
@@ -59,6 +72,9 @@
       favoriteText () {
         return this.favorite ? '已收藏' : '收藏'
       }
+    },
+    created () {
+      this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee']
     },
     methods: {
       toggleFavorite (event) {
@@ -156,5 +172,65 @@
         }
       }
     }
+    .bulletin{
+      padding: 18px;
+      padding-bottom: 0;
+      .title{
+        line-height: 14px;
+        font-size: 14px;
+        color: rgb(7,17,27);
+
+      }
+      .content-wrapper{
+        padding: 8px 12px 16px 8px;
+        @include border-1px (rgba(7,17,27,0.1));
+        .content{
+          line-height: 24px;
+          font-size: 12px;
+          color: rgb(240,20,20);
+        }
+      }
+      .supports{
+        .support-item{
+          padding: 16px 12px;
+          font-size: 0;
+          &:not(:last-of-type) {
+            @include border-1px(rgba(7,17,27,0.1));
+          }
+          .icon{
+            display: inline-block;
+            vertical-align: top;
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+            background-size: 12px 12px;
+            background-repeat: no-repeat;
+            &.decrease{
+              @include bg-img('decrease_4');
+            }
+            &.discount{
+              @include bg-img('discount_4');
+            }
+            &.special{
+              @include bg-img('special_4');
+            }
+            &.invoice{
+              @include bg-img('invoice_4');
+            }
+            &.guarantee{
+              @include bg-img('guarantee_4');
+            }
+          }
+          .text{
+            display: inline-block;
+            line-height: 16px;
+            vertical-align: top;
+            font-size: 12px;
+            color: rgb(7,17,27);
+          }
+        }
+      }
+    }
+    
   }
 </style>
