@@ -1,5 +1,5 @@
 <template>
-  <div class="seller">
+  <div class="seller" ref="seller">
     <div class="seller-content">
       <div class="overview">
         <h1 class="title">{{seller.name}}</h1>
@@ -47,11 +47,29 @@
         </ul>
       </div>
       <split></split>
+      <div class="pics">
+        <h1 class="title">商家实景</h1>
+          <div class="pics-wrapper" ref="pics">
+            <ul class="pic-list" ref="picList">
+              <li class="pic-item" v-for="(pic, index) in seller.pics">
+                <img :src="pic" width="120" height="90">
+              </li>
+            </ul>
+          </div>
+      </div>
+      <split></split>
+      <div class="info">
+        <h1 class="title border-1px">商家信息</h1>
+        <ul>
+          <li class="info-list border-1px" v-for="(info, index) in seller.infos">{{info}}</li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
+  import BScroll from 'better-scroll'
   import star from '../star/star'
   import split from '../split/split'
   export default {
@@ -73,8 +91,22 @@
         return this.favorite ? '已收藏' : '收藏'
       }
     },
+    watch: {
+      'seller' () {
+        this.$nextTick(() => {
+          this._initScroll()
+          this._initPics()
+        })
+      }
+    },
     created () {
       this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee']
+    },
+    mounted () {
+      this.$nextTick(() => { // 确保刚进入页面时能滚动
+        this._initScroll()
+        this._initPics()
+      })
     },
     methods: {
       toggleFavorite (event) {
@@ -82,6 +114,35 @@
         //   return
         // }
         this.favorite = !this.favorite
+      },
+      // 商家页面上下滚动
+      _initScroll () {
+        if (!this.scroll) {
+          this.scroll = new BScroll(this.$refs.seller, {
+            click: true
+          })
+        } else {
+          this.scroll.refresh()
+        }
+      },
+      // 商家实景横向滚动
+      _initPics () {
+        if (this.seller.pics) {
+          let picWidth = 120
+          let picMargin = 6
+          let width = this.seller.pics.length * (picWidth + picMargin) - picMargin
+          this.$refs.picList.style.width = width + 'px'
+          this.$nextTick(() => {
+            if (!this.picScroll) {
+                this.picsScroll = new BScroll(this.$refs.pics, {
+                scrollX: true,
+                eventPassthrough: 'vertical'
+              })
+            } else {
+              this.scroll.refresh()
+            }
+          })
+        }
       }
     }
   }
@@ -93,6 +154,7 @@
   .seller{
     position: absolute;
     left: 0;
+    bottom: 0;
     top:178px;
     width: 100%;
     overflow: hidden;
@@ -231,6 +293,47 @@
         }
       }
     }
-    
+    .pics{
+      padding: 18px 0 18px 18px;
+      .title{
+        margin-bottom: 12px;
+        line-height: 14px;
+        font-size: 14px;
+        color: rgb(7,17,27);
+      }
+      .pics-wrapper{
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        .pic-list{
+          font-size: 0;
+          .pic-item{
+            display: inline-block;
+            &:not(:last-child){
+              margin-right: 6px;
+            }
+          }
+        }
+      }
+    }
+    .info{
+      padding: 18px;
+      .title{
+        padding: 12px;
+        line-height: 14px;
+        font-size: 14px;
+        color: rgb(7,17,27);
+        @include border-1px(rgba(7,17,27,.1));
+      }
+      .info-list{
+        padding: 16px 12px;
+        line-height: 16px;
+        font-size: 12px;
+        color: rgb(7,17,27);
+        &:not(:last-child){
+          @include border-1px(rgba(7,17,27,.1));
+        }
+      }
+    }
   }
 </style>
