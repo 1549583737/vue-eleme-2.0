@@ -8,12 +8,19 @@
       <router-link to="/ratings">评价</router-link>
       <router-link to="/seller">商家</router-link>
     </div>
-    <router-view :seller="seller"></router-view>  
+    <keep-alive>
+      <router-view :seller="seller"></router-view>
+    </keep-alive>  
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import header from './components/header/header.vue'
+  import {urlParse} from './common/js/util'
+
+  const ERR_OK = 0
+  const debug = process.env.NODE_ENV !== 'production'
+
   export default {
     data () {
       return {
